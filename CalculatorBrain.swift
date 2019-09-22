@@ -14,7 +14,12 @@ struct CalculatorBrain {
     mutating func clearAccumulator() {
         accumulator = nil
     }
-    
+    var result: Double? {
+        get {
+            return accumulator
+        }
+    }
+
     private enum Operation {
         case constant(Double)
         case unaryOperation((Double) -> Double)
@@ -44,8 +49,8 @@ struct CalculatorBrain {
             case .constant(let value) :
                 accumulator = value
             case .unaryOperation(let function) :
-                if accumulator != nil {
-                    accumulator = function(accumulator!)
+                if let accumulator = accumulator {
+                    self.accumulator = function(accumulator)
                 }
             case .binaryOperation(let function) :
                 if accumulator != nil {
@@ -82,9 +87,4 @@ struct CalculatorBrain {
         accumulator = operand
     }
     
-    var result: Double? {
-        get {
-            return accumulator
-        }
-    }
 }

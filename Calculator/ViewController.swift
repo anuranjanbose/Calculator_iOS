@@ -10,28 +10,12 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var userIsInMiddleOfTyping = false
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-            }
-    
+    // MARK:- IBOutlets
     @IBOutlet weak var display: UILabel!
-    @IBAction func digitTouch(_ sender: UIButton) {
-        
-        let digit = sender.currentTitle!
-        let currentLabel = display.text!
-        if userIsInMiddleOfTyping {
-            display.text = currentLabel + digit
-        }
-        else{
-            display.text = digit
-            
-                userIsInMiddleOfTyping = true
-            
-        }
-    }
     
+    // MARK:- Public Properties
+    var userIsInMiddleOfTyping = false
+    var isDotPressed = false
     var displayValue : Double {
         get {
             return Double(display.text!)!
@@ -40,18 +24,41 @@ class ViewController: UIViewController {
             display.text = String(newValue)
         }
     }
-    
-   
-    @IBAction func clearButton(_ sender: UIButton) {
-        display.text = "0"
-        brain.clearAccumulator()
-        userIsInMiddleOfTyping = false
+    private var brain = CalculatorBrain()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
     }
     
-    private var brain = CalculatorBrain()
-    @IBAction func operation(_ sender: UIButton) {
-        if userIsInMiddleOfTyping {
+    // MARK:- IBActions
+    @IBAction func digitTouch(_ sender: UIButton) {
         
+        let digit = sender.currentTitle!
+        let currentLabel = display.text!
+        
+        if userIsInMiddleOfTyping {
+            if digit == "." && isDotPressed == false {
+                display.text = currentLabel + digit
+                isDotPressed = true
+            } else if digit != "." {
+                display.text = currentLabel + digit
+            }
+        } else {
+            if digit == "." && isDotPressed == false {
+                display.text = digit
+                userIsInMiddleOfTyping = true
+                isDotPressed = true
+            } else if digit != "." {
+                display.text = digit
+                userIsInMiddleOfTyping = true
+            }
+            
+        }
+    }
+    
+    @IBAction func operation(_ sender: UIButton) {
+        isDotPressed = false
+        if userIsInMiddleOfTyping {
             brain.setOperand(displayValue)
             userIsInMiddleOfTyping = false
         }
@@ -61,10 +68,15 @@ class ViewController: UIViewController {
         }
         if let result = brain.result {
             displayValue = result
-            
         }
         
     }
     
+    @IBAction func clearButton(_ sender: UIButton) {
+        display.text = "0"
+        brain.clearAccumulator()
+        userIsInMiddleOfTyping = false
+        isDotPressed = false
+    }
 }
 
